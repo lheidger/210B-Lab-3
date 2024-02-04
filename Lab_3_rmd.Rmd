@@ -2,7 +2,9 @@
 title: "Lab 3"
 author: "Lily Heidger"
 date: "2024-02-01"
-output: pdf_document
+output:
+  pdf_document:
+    latex_engine: xelatex
 ---
 
 ```{r setup}
@@ -147,30 +149,34 @@ City: 28300
 Suburbs: 21700
 
 Year 2:
-City: 21577
-Suburbs: 28423
+City: 26923
+Suburbs: 23077
 
 Year 3: 
-City: 21477
-Suburbs: 28523
+City: 25808
+Suburbs: 24192
 
-City Equilibrium = 21053
-Suburbs Equilibrium = 28945
+City Equilibrium = 24904
+Suburbs Equilibrium = 25096
 
 ```{r}
 total_pop <- 50000
+Pcity0 <- 30000
+Psub0 <- 20000
+
 Pcity1 <- (0.89*30000)+(0.08*20000)
 Psub1 <- (0.92*20000)+(0.11*30000)
 
 50000-Psub1
 
 #year 2
-Psub2 <-  (0.92*28300)+(0.11*21700)
+Psub2 <-  (0.92*21700)+(0.11*28300)
 
+Psub2
 50000- Psub2
 
 #year 3
-Psub3 <- (0.92 *28423) + (0.11*21577)
+Psub3 <- (0.92 *23077) + (0.11*26923)
 Psub3
 
 50000-Psub3
@@ -178,10 +184,49 @@ Psub3
 #PcityEquil <- (0.89*x) + (0.08 * y)
 #PcityEquil
 
+
+
 # Pcity = 0.89(Pcity) +0.08(50,000 - Pcity)
 
 PcityEquil <- 21052.63
 50000- PcityEquil
+
+
+
+total_pop <- 50000
+Pcity <- numeric(11)
+Psub <- numeric(11)
+
+
+Pcity[1] <- 30000
+Psub[1] <- 20000
+
+
+for (year in 2:11) {Pcity[year] <- 0.89 * Pcity[year - 1] + 0.08 * Psub[year - 1] Psub[year] <- 0.92 * Psub[year - 1] + 0.11 * Pcity[year - 1]}
+
+
+pop <- data.frame(Year = 0:10, Pcity, Psub)
+pop <- pop |>
+  select(Year, Psub,Pcity)
+
+pop
+
+
+ggplot(pop, aes(x = Year)) +
+  geom_line(aes(y = Pcity, color = "City"), size = 1) +
+  geom_line(aes(y = Psub, color = "Suburb"), size = 1) +
+  labs(x = "Year", y = "Population") +
+  scale_color_manual(values = c("City" = "blue", "Suburb" = "green")) +
+  theme_minimal()
+
+equillibrium <- which.min(abs(Pcity - Psub))
+equil_city <- Pcity[equillibrium]
+equil_suburb <- Psub[equillibrium]
+
+
+cat("Equillibrium - City:", equil_city, "\n")
+cat("Equillibrium - Suburb:", equil_suburb, "\n")
+
 
 ```
 
@@ -315,11 +360,11 @@ probability_more_than_320
 ```
 
 ##### What number of customers will be exceeded 10% of the time?
-10% of the time, the number of customers will exceed 109. 
+10% of the time, the number of customers will exceed ~391. 
 ```{r}
 prob_10_percent <- 0.10
 
-customers_exceeded_10_percent <- qnorm(prob_10_percent, mean_customers, sd_customers)
+customers_exceeded_10_percent <- qnorm(prob_10_percent, mean_customers, sd_customers, lower.tail = FALSE)
 
 customers_exceeded_10_percent
 
